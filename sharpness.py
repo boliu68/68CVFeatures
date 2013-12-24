@@ -48,8 +48,7 @@ def avg_lum(yuv_img):
             if i - 1 >= 0:
                 if j - 1 >= 0:
                     intensity += lum_img[i-1, j-1]
-                    intensity += lum_img[i, j-1]
-                    num += 2
+                    num += 1
                 if j + 1 < w:
                     intensity += lum_img[i-1, j+1]
                     num += 1
@@ -58,12 +57,18 @@ def avg_lum(yuv_img):
             if i + 1 < h:
                 if j+1 < w:
                     intensity += lum_img[i+1, j+1]
-                    intensity += lum_img[i, j+1]
                     num += 2
                 if j-1 >= 0:
                     intensity += lum_img[i+1, j-1]
                     num += 1
                 intensity += lum_img[i+1, j]
+                num += 1
+
+            if j - 1 >= 0:
+                intensity += lum_img[i, j-1]
+                num += 1
+            if j + 1 < w:
+                intensity += lum_img[i, j+1]
                 num += 1
 
             #if i == 1 and j == 1:

@@ -57,7 +57,7 @@ def get_naturalness(img):
     #Ranking and classifying attractiveness of photos in folksonomies.
     hsl_img = bgr2hsl(img)
     pixels = hsl_img[((hsl_img[:,:,2]<0.8) * (hsl_img[:,:,2]>0.2) * (hsl_img[:,:,1]> 0.1))]
-    print pixels.shape
+    #print pixels.shape
 
     #print np.sum((hsl_img[:,:, 0]>=300))
 
@@ -87,4 +87,4 @@ def get_naturalness(img):
 
     N = (num_A * N_skin + num_B * N_grass + num_C * N_sky) / (num_A + num_B + num_C)
 
-    print N
+    return N

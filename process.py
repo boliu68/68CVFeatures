@@ -5,6 +5,7 @@ import numpy as np
 from lighting import *
 from color import *
 from sharpness import *
+from subject import *
 
 def img_process(img):
 
@@ -16,6 +17,7 @@ def img_process(img):
 
     #sharpness blur
     sharpness = sharpness_blur(img)
-    print sharpness
 
+    #subject quality
+    subject(img)
 
