@@ -14,6 +14,18 @@ def subject(img):
 
     saliency_map = get_saliency(img)
 
+    saliency_map3 = np.zeros((saliency_map.shape[0], saliency_map.shape[1], 3))
+    saliency_map3[:, :, 0] = saliency_map
+    saliency_map3[:, :, 1] = saliency_map
+    saliency_map3[:, :, 2] = saliency_map
+    img3 = np.array(img * saliency_map3, dtype = np.float32)
+
+
+    sb_lgt_mean, sb_lgt_var = lighting(img3)
+    [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness] = color(img3)
+    sb_sharpness = sharpness_blur(img3)
+
+    return [sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness]
 
 
 def get_saliency(img):
@@ -22,7 +34,7 @@ def get_saliency(img):
     #k: the radius of neighbour.
 
     height, width = img.shape[:2]
-    saliency_map = np.zeros([height, width], dtype = np.float32)
+    saliency_map = np.zeros([height, width], dtype = np.float16)
     radius = 1
 
 
@@ -30,6 +42,7 @@ def get_saliency(img):
         for w in range(width):
             for k in range(radius):
                 r = k + 1
+                #print h, w
                 neighbor = np.array(img[h, w, :])
                 if h - r >= 0:
                     if w - r >= 0:

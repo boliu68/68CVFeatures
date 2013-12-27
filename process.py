@@ -10,14 +10,14 @@ from subject import *
 def img_process(img):
 
     #lighting 2 features
-    mean, std = lighting(img)
+    lgt_mean, lgt_var = lighting(img)
 
     #colors
-    color(img)
+    [hue_mean, sat_mean, hue_std, sat_std, contrast_color, colorfulness, naturalness] = color(img)
 
     #sharpness blur
     sharpness = sharpness_blur(img)
 
     #subject quality
-    subject(img)
+    [sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness] = subject(img)
 

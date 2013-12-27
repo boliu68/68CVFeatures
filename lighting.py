@@ -11,11 +11,9 @@ def lighting(img):
     gray_img = cvtColor(img, COLOR_BGR2GRAY)
     yuv_img = cvtColor(img, COLOR_BGR2YUV)
 
-    #gray_img = np.divide(gray_img, 256.00000)
+    y_img = yuv_img[:, :, 0]
 
-    mean = np.mean(yuv_img)
-    var = np.var(yuv_img)
-    #print mean
-    #print var
+    mean = np.mean(y_img)
+    var = np.var(y_img)
 
     return [mean, var]

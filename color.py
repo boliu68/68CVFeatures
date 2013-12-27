@@ -32,6 +32,7 @@ def color(img):
     #naturalness
     naturalness = get_naturalness(img)
 
+    return [hue_mean, sat_mean, hue_std, sat_std, contrast_color, colorfulness, naturalness]
 
 def get_colorfulness(img):
 
