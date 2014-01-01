@@ -19,5 +19,6 @@ def img_process(img):
     sharpness = sharpness_blur(img)
 
     #subject quality
-    [sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness] = subject(img)
+    [subject_region, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness] = subject(img)
 
+    

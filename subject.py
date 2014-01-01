@@ -5,16 +5,24 @@ import numpy as np
 from lighting import *
 from color import *
 from sharpness import *
-import scipy.spatial.distance as sci_dist
-import scipy as sci
+import scipy.cluster.vq as cluster_vq
+from scipy.cluster.vq import vq
+from Saliency import *
+from attend_view import *
 
 def subject(img):
 
     #gray_img = CvtColor(img, COLOR_BGR2GRAY)
 
     saliency_map = get_saliency(img)
+    [x0, y0, W, H] = attend_view(saliency_map) #get teh subject area
+    rectangle(saliency_map, (int(x0 - H / 2), int(y0 - W / 2)), (int(x0 + H / 2), int(y0 + W / 2)), 255)
+
+    #imshow('attended img', saliency_map)
+    #waitKey(0)
 
     saliency_map3 = np.zeros((saliency_map.shape[0], saliency_map.shape[1], 3))
+
     saliency_map3[:, :, 0] = saliency_map
     saliency_map3[:, :, 1] = saliency_map
     saliency_map3[:, :, 2] = saliency_map
@@ -23,37 +31,45 @@ def subject(img):
 
     sb_lgt_mean, sb_lgt_var = lighting(img3)
     [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness] = color(img3)
-    sb_sharpness = sharpness_blur(img3)
+    sb_sharpness = sharpness_blur(img3[int(x0 - H / 2):int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2), :])
 
-    return [sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness]
+    return [{'x0':x0, 'y0':y0, 'W':W, 'H':H}, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness]
 
 
 def get_saliency(img):
 
     #calculate the contrast/ distance to the neighbor
     #give the radius of neighbour.
-    block_img = np.array(img)
     radius = 1
-    #n = 3
 
-    #imshow('block_img', block_img)
-    #waitKey(0)
+    #change color space and color quantization
+    luv = cvtColor(img, COLOR_BGR2LUV)
+    #luv = np.array(img)
 
-    luv = cvtColor(block_img, COLOR_BGR2LUV)
+    #preprocessing
 
-    #imshow('luv', luv)
+    #luv = color_quant(luv, 10)
+    #print '----------PeerGroupFiltering-------------'
+    luv = PeerGroupFiltering(luv, 3)
+    #luv = block_divide(luv, 2)
+
+    #imshow('after preprocess', luv)
     #waitKey(0)
 
     #generate the saliency map
+    #print '---------saliency distance---------------'
     saliency_map = saliency_distance(luv, radius)
 
-    #normalize
-    saliency_map = (saliency_map / (np.max(saliency_map) - np.min(saliency_map)))
+    #print '-------------smoothing-------------------'
+    #gaussian smooth and normalize saliency
+    #saliency_map = GaussianBlur(saliency_map, (5, 5), 0)
+    saliency_map = medianSmooth(saliency_map, 3)
+    saliency_map = ((saliency_map - np.min(saliency_map)) / (np.max(saliency_map) - np.min(saliency_map)))
 
     #imshow('saliency', saliency_map)
     #waitKey(0)
 
-    fuzzy_grow(saliency_map)
+    #saliency_map = fuzzy_grow(saliency_map)
 
     return saliency_map
 
@@ -88,8 +104,10 @@ def fuzzy_grow(saliency_map):
 
     attended_area = attended_area * 255
 
-    imshow('grow map', attended_area)
-    waitKey(0)
+    #imshow('grow map', attended_area)
+    #waitKey(0)
+
+    return attended_area
 
 def optim_ua(p_gk, gk, a, u):
 
@@ -125,52 +143,98 @@ def saliency_distance(luv, radius):
 
     for h in range(height):
         for w in range(width):
-            for k in range(radius):
-                r = k + 1
-                #print h, w
-                neighbor = np.array(luv[h, w, :])
-                if h - r >= 0:
-                    if w - r >= 0:
-                        #saliency_map[h, w] += math.sqrt((img[h, w, :] - img[h-r, w-r, :]) ** 2)
-                        neighbor = np.vstack([neighbor, luv[h - r, w - r, :]])
-                    if w + r < width:
-                        neighbor = np.vstack([neighbor, luv[h - r, w + r, :]])
-                    neighbor = np.vstack([neighbor, luv[h - r, w, :]])
 
-                if h + r < height:
-                    if w - r >= 0:
-                        #saliency_map[h, w] += math.sqrt((img[h, w, :] - img[h-r, w-r, :]) ** 2)
-                        neighbor = np.vstack([neighbor, luv[h + r, w - r, :]])
-                    if w + r < width:
-                        neighbor = np.vstack([neighbor, luv[h + r, w + r, :]])
-                    neighbor = np.vstack([neighbor, luv[h + r, w, :]])
+            left = w - radius
+            right = w + radius
+            top = h - radius
+            bottom = h + radius
 
-                if w - r >= 0:
-                    neighbor = np.vstack([neighbor, luv[h, w - r, :]])
+            if left < 0:
+                left = 0
+            if right >= width:
+                right = width - 1
+            if top < 0:
+                top = 0
+            if bottom >= height:
+                bottom = height
 
-                if w + r < width:
-                    neighbor = np.vstack([neighbor, luv[h, w + r, :]])
+            neighbor = luv[top:bottom, left:right, :]
+            neighbor = np.reshape(neighbor, (neighbor.shape[0] * neighbor.shape[1], 3))
 
-                saliency_map[h, w] += sum([math.sqrt(sci.inner(luv[h, w, :] - neigh, luv[h, w, :] - neigh)) for neigh in neighbor])
+            saliency_map[h, w] += sum([gaussian_distance(luv[h, w, :], neigh) for neigh in neighbor])
 
     return saliency_map
 
 
-def preprocess(img):
-     #for i in range(height / n):
-    #    for j in range(width / n):
-    #        block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 0] = np.mean(block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 0])
-    #        block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 1] = np.mean(block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 1])
-    #        block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 2] = np.mean(block_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 2])
-    #
-    #    block_img[i * n : (i + 1) * n, (j + 1) * n::, 0] = np.mean(block_img[i * n : (i + 1) * n, (j + 1) * n::, 0])
-    #    block_img[i * n : (i + 1) * n, (j + 1) * n::, 1] = np.mean(block_img[i * n : (i + 1) * n, (j + 1) * n::, 1])
-    #    block_img[i * n : (i + 1) * n, (j + 1) * n::, 2] = np.mean(block_img[i * n : (i + 1) * n, (j + 1) * n::, 2])
-    #
-    #for j in range(width / n):
-    #    block_img[(i + 1) * n::, j * n : (j + 1) * n, 0] = np.mean(block_img[(i + 1) * n::, j * n : (j + 1) * n, 0])
-    #    block_img[(i + 1) * n::, j * n : (j + 1) * n, 1] = np.mean(block_img[(i + 1) * n::, j * n : (j + 1) * n, 1])
-    #    block_img[(i + 1) * n::, j * n : (j + 1) * n, 2] = np.mean(block_img[(i + 1) * n::, j * n : (j + 1) * n, 2])
-    pass
+def gaussian_distance(x, y):
+
+    elu_dist = math.sqrt(np.dot((x - y), (x-y).transpose()))
+    #elu_dist = np.dot((x - y), (x-y).transpose())
+    #return (1 - math.exp(- elu_dist/2))
+    return elu_dist
+
+def color_quant(img, k):
+    #color quantization using kmeans
+
+    pixel = np.reshape(img, (img.shape[0] * img.shape[1], 3))
+    centroids, _ = cluster_vq.kmeans(pixel, k)
+    qnt, _ = vq(pixel, centroids)
+
+    centers_idx = np.reshape(qnt, (img.shape[0], img.shape[1]))
+    clustered = centroids[centers_idx]
+
+    return clustered
+
+def block_divide(img, n):
+
+    height = img.shape[0]
+    width = img.shape[1]
+
+    di_img = np.array(img)
+
+    for i in range(height / n):
+       for j in range(width / n):
+           di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 0] = np.mean(di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 0])
+           di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 1] = np.mean(di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 1])
+           di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 2] = np.mean(di_img[i * n : (i + 1) * n, j * n : (j + 1) * n, 2])
+
+       di_img[i * n : (i + 1) * n, (j + 1) * n::, 0] = np.mean(di_img[i * n : (i + 1) * n, (j + 1) * n::, 0])
+       di_img[i * n : (i + 1) * n, (j + 1) * n::, 1] = np.mean(di_img[i * n : (i + 1) * n, (j + 1) * n::, 1])
+       di_img[i * n : (i + 1) * n, (j + 1) * n::, 2] = np.mean(di_img[i * n : (i + 1) * n, (j + 1) * n::, 2])
+
+    for j in range(width / n):
+       di_img[(i + 1) * n::, j * n : (j + 1) * n, 0] = np.mean(di_img[(i + 1) * n::, j * n : (j + 1) * n, 0])
+       di_img[(i + 1) * n::, j * n : (j + 1) * n, 1] = np.mean(di_img[(i + 1) * n::, j * n : (j + 1) * n, 1])
+       di_img[(i + 1) * n::, j * n : (j + 1) * n, 2] = np.mean(di_img[(i + 1) * n::, j * n : (j + 1) * n, 2])
 
 
+    return di_img
+
+def medianSmooth(saliency, radius):
+
+    height, width = saliency.shape
+    smooth_saliency = np.array(saliency)
+
+    for h in range(height):
+        for w in range(width):
+
+            left = w - radius
+            right = w + radius
+            top = h - radius
+            bottom = h + radius
+
+            if left < 0:
+                left = 0
+            if right >= width:
+                right = width - 1
+            if top < 0:
+                top = 0
+            if bottom >= height:
+                bottom = height
+
+            neighbor = saliency[top:bottom, left:right]
+            #neighbor = np.reshape(neighbor, (neighbor.shape[0] * neighbor.shape[1], 1))
+
+            smooth_saliency[h, w] = np.mean(neighbor)
+
+    return smooth_saliency
