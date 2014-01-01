@@ -6,6 +6,7 @@ from lighting import *
 from color import *
 from sharpness import *
 from subject import *
+from rule_third import *
 
 def img_process(img):
 
@@ -19,6 +20,9 @@ def img_process(img):
     sharpness = sharpness_blur(img)
 
     #subject quality
-    [subject_region, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness] = subject(img)
+    [saliency_map, subject_region, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness] = subject(img)
 
-    
+    #rule of third
+    rule3rd = rule_of_third(img, subject_region)
+
+
