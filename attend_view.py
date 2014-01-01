@@ -5,10 +5,6 @@ import numpy as np
 
 def attend_view(saliency):
 
-    print np.max(saliency)
-    print np.min(saliency)
-    print saliency.shape
-
     CM = np.sum(saliency)
 
     x0 = np.sum([np.sum(saliency[i, :] * i) for i in range(saliency.shape[0])]) / CM

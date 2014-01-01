@@ -7,6 +7,7 @@ from color import *
 from sharpness import *
 from subject import *
 from rule_third import *
+from simplicity import *
 
 def img_process(img):
 
@@ -25,4 +26,8 @@ def img_process(img):
     #rule of third
     rule3rd = rule_of_third(img, subject_region)
 
+    #obtain the simplicity features
+    [qimg, qimg3, qh, qh_sub] = get_simplicity(img, saliency_map, subject_region)
+
+    #print qh, qh_sub
 
