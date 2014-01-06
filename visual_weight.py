@@ -4,8 +4,6 @@ from cv2 import *
 import numpy as np
 import math
 
-
-
 def visual_weight(img, subject_region):
     #The clarity contrast between subject region and the whole image
 

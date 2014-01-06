@@ -30,10 +30,10 @@ def subject(img):
 
 
     sb_lgt_mean, sb_lgt_var = lighting(img3)
-    [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness] = color(img3)
+    [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_bvar, sb_gvar, sb_rvar, sb_colorfulness, sb_naturalness] = color(img3)
     sb_sharpness = sharpness_blur(img3[int(x0 - H / 2):int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2), :])
 
-    return [saliency_map, {'x0':x0, 'y0':y0, 'W':W, 'H':H}, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_contrast_color, sb_colorfulness, sb_naturalness, sb_sharpness]
+    return [saliency_map, {'x0':x0, 'y0':y0, 'W':W, 'H':H}, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_bvar, sb_gvar, sb_rvar, sb_colorfulness, sb_naturalness, sb_sharpness]
 
 
 def get_saliency(img):

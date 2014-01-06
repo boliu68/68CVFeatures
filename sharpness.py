@@ -73,7 +73,10 @@ def avg_lum(yuv_img):
 
             #if i == 1 and j == 1:
                 #print intensity, num
-            avg[i, j] = intensity / num
+            avg[i, j] = intensity * 1.0000 / num
+
+            if intensity == 0:
+                avg[i, j]
 
     return avg
 
