@@ -21,13 +21,13 @@ if __name__ == '__main__':
 
 	for i in range(len(label_idx)):
 		info = label_idx[i].split(',')
-		label = info[1]
+		label = int(info[1])
 		img_idx = info[0]
 		print 'label', label, 'image', img_idx 
-		img_path = os.path.join(img_path, img_idx + '.jpg')
+		img_path = os.path.join(img_dir, img_idx + '.jpg')
 		image = cv2.imread(img_path, 1)
 		resize_img = cv2.resize(image, (100, 100))
-		fea = img_process(resize_img, writer, path, label)
+		fea = img_process(resize_img, writer, img_idx, label)
 		output_file.flush()
 		
 	output_file.close()

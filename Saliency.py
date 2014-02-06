@@ -5,7 +5,7 @@
 from cv2 import *
 import numpy as np
 import math
-
+import warnings
 
 def PeerGroupFiltering(img, window_size):
 
@@ -55,14 +55,23 @@ def PeerGroupFiltering(img, window_size):
                     a2 = a2 / (k - h)
                 else:
                     a2 = 0
+		
+
+		#if a1 == 0:
+		   # print 'a1'
+		#if a2 == 0:
+		    #print 'a2'
 
                 #Find s1Sq
                 s1Sq = sum((sort_dist[:(h+1)] - a1) ** 2)
 
                 #Find s2Sq
                 s2Sq = sum(((sort_dist[h:k]) - a2) ** 2)
-
-                J[h] = ((a1 - a2) ** 2) / (s1Sq + s2Sq)
+		
+		if s1Sq + s2Sq != 0:
+		    J[h] = ((a1 - a2) ** 2) / (s1Sq + s2Sq)
+		else:
+		    J[h] = 0
 
             modified_gauss = np.array(gauss_kernel)
             groupsize = np.argmax(J)
