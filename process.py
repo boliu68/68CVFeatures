@@ -24,7 +24,7 @@ def img_process(img, writer, path, label):
     #lighting 2 features
     lgt_mean, lgt_var = lighting(img)
     fea['lighting_fea'] = [lgt_mean, lgt_var ]
-    fea_vec += [lgt_mean, lgt_var ]
+    fea_vec += [lgt_mean, lgt_var]
 
     #colors
     [hue_mean, sat_mean, hue_std, sat_std, b_var, g_var, r_var, colorfulness, naturalness] = color(img)

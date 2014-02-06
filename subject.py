@@ -151,11 +151,11 @@ def saliency_distance(luv, radius):
 
             if left < 0:
                 left = 0
-            if right >= width:
-                right = width - 1
+            if right > width:
+                right = width
             if top < 0:
                 top = 0
-            if bottom >= height:
+            if bottom > height:
                 bottom = height
 
             neighbor = luv[top:bottom, left:right, :]

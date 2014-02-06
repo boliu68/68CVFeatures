@@ -43,40 +43,58 @@ def avg_lum(yuv_img):
 
     for i in range(h):
         for j in range(w):
-            intensity = 0
-            num = 0
-            if i - 1 >= 0:
-                if j - 1 >= 0:
-                    intensity += lum_img[i-1, j-1]
-                    num += 1
-                if j + 1 < w:
-                    intensity += lum_img[i-1, j+1]
-                    num += 1
-                intensity += lum_img[i-1, j]
-                num += 1
-            if i + 1 < h:
-                if j+1 < w:
-                    intensity += lum_img[i+1, j+1]
-                    num += 2
-                if j-1 >= 0:
-                    intensity += lum_img[i+1, j-1]
-                    num += 1
-                intensity += lum_img[i+1, j]
-                num += 1
+            #intensity = 0
+            #num = 0
+            #if i - 1 >= 0:
+            #    if j - 1 >= 0:
+            #        intensity += lum_img[i-1, j-1]
+            #        num += 1
+            #    if j + 1 < w:
+            #        intensity += lum_img[i-1, j+1]
+            #        num += 1
+            #    intensity += lum_img[i-1, j]
+            #    num += 1
+            #if i + 1 < h:
+            #    if j+1 < w:
+            #        intensity += lum_img[i+1, j+1]
+            #        num += 2
+            #    if j-1 >= 0:
+            #        intensity += lum_img[i+1, j-1]
+            #        num += 1
+            #    intensity += lum_img[i+1, j]
+            #    num += 1
+            #
+            #if j - 1 >= 0:
+            #    intensity += lum_img[i, j-1]
+            #    num += 1
+            #if j + 1 < w:
+            #    intensity += lum_img[i, j+1]
+            #    num += 1
+            #
+            ##if i == 1 and j == 1:
+            #    #print intensity, num
+            #avg[i, j] = intensity * 1.0000 / num
+            #
+            #if intensity == 0:
+            #    avg[i, j] = 1
+            left = i - 1
+            top = j - 1
+            right = i + 1
+            bottom = j + 1
 
-            if j - 1 >= 0:
-                intensity += lum_img[i, j-1]
-                num += 1
-            if j + 1 < w:
-                intensity += lum_img[i, j+1]
-                num += 1
+            if i - 1 < 0:
+                left = 0
+            if j - 1 < 0:
+                top = 0
+            if i + 1 > h:
+                right = h
+            if j + 1 > w:
+                bottom = w
 
-            #if i == 1 and j == 1:
-                #print intensity, num
-            avg[i, j] = intensity * 1.0000 / num
+            avg[i, j] = np.mean(lum_img[left: right, top : bottom])
 
-            if intensity == 0:
-                avg[i, j]
+            if avg[i, j] == 0:
+                avg[i, j] = 1
 
     return avg
 
