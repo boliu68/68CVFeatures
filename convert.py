@@ -10,7 +10,6 @@ def bgr2hsl(img):
     #convert the brg space to hsl space
 	bgr_ = np.array(img, np.float32)
 	bgr_ = np.divide(bgr_, 255.0)
-
     #print bgr_
 	Cmax = np.amax(bgr_, 2)
 	Cmin = np.amin(bgr_, 2)
@@ -28,7 +27,7 @@ def bgr2hsl(img):
 	H = (60 * (np.mod((bgr_[:, :, 1] - bgr_[:, :, 0])*1.00/ delta_nonzero, 6))) * ((Cmax_ind == 2) * (delta != 0))
 	H = H + ((60 * ((bgr_[:, :, 0] - bgr_[:, :, 2])* 1.00/ delta_nonzero + 2)) * ((Cmax_ind == 1) * (delta != 0)))
 	H = H + ((60 * ((bgr_[:, :, 2] - bgr_[:, :, 1])* 1.00 / delta_nonzero + 4)) * ((Cmax_ind == 0) * (delta != 0)))
-	
+
 	L = (Cmax + Cmin) / 2
 	
 	L_nonzero = np.array(L)
@@ -40,7 +39,7 @@ def bgr2hsl(img):
 	hsl[:, :, 0] = H
 	hsl[:, :, 1] = S
 	hsl[:, :, 2] = L
-	
+
 	#S[np.isnan(S)] = 1
 
 	return hsl

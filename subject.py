@@ -15,23 +15,14 @@ def subject(img):
     #gray_img = CvtColor(img, COLOR_BGR2GRAY)
 
     saliency_map = get_saliency(img)
+    
     [x0, y0, W, H] = attend_view(saliency_map) #get teh subject area
-    rectangle(saliency_map, (int(x0 - H / 2), int(y0 - W / 2)), (int(x0 + H / 2), int(y0 + W / 2)), 255)
-
-    #imshow('attended img', saliency_map)
-    #waitKey(0)
 
     saliency_map3 = np.zeros((saliency_map.shape[0], saliency_map.shape[1], 3))
 
-    saliency_map3[:, :, 0] = saliency_map
-    saliency_map3[:, :, 1] = saliency_map
-    saliency_map3[:, :, 2] = saliency_map
-    img3 = np.array(img * saliency_map3, dtype=np.float32)
-
-
-    sb_lgt_mean, sb_lgt_var = lighting(img3)
-    [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_bvar, sb_gvar, sb_rvar, sb_colorfulness, sb_naturalness] = color(img3)
-    sb_sharpness = sharpness_blur(img3[int(x0 - H / 2):int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2), :])
+    sb_lgt_mean, sb_lgt_var = lighting(img, saliency_map)
+    [sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_bvar, sb_gvar, sb_rvar, sb_colorfulness, sb_naturalness] = color(img, saliency_map)
+    sb_sharpness = sharpness_blur(img[int(x0 - H / 2):int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2), :])
 
     return [saliency_map, {'x0':x0, 'y0':y0, 'W':W, 'H':H}, sb_lgt_mean, sb_lgt_var, sb_hue_mean, sb_sat_mean, sb_hue_std, sb_sat_std, sb_bvar, sb_gvar, sb_rvar, sb_colorfulness, sb_naturalness, sb_sharpness]
 
@@ -44,34 +35,19 @@ def get_saliency(img):
 
     #change color space and color quantization
     luv = cvtColor(img, COLOR_BGR2LUV)
-    #luv = np.array(img)
-
+    
     #preprocessing
-
-    #luv = color_quant(luv, 10)
-    #print '----------PeerGroupFiltering-------------'
-    luv = PeerGroupFiltering(luv, 3)
+    #luv = PeerGroupFiltering(luv, 3)
     #luv = block_divide(luv, 2)
 
-    #imshow('after preprocess', luv)
-    #waitKey(0)
-
     #generate the saliency map
-    #print '---------saliency distance---------------'
     saliency_map = saliency_distance(luv, radius)
 
-    #print '-------------smoothing-------------------'
     #gaussian smooth and normalize saliency
-    #saliency_map = GaussianBlur(saliency_map, (5, 5), 0)
     saliency_map = medianSmooth(saliency_map, 3)
-    saliency_map = ((saliency_map - np.min(saliency_map)) / (np.max(saliency_map) - np.min(saliency_map)))
-
-    #imshow('saliency', saliency_map)
-    #waitKey(0)
-
-    #saliency_map = fuzzy_grow(saliency_map)
-
-    return saliency_map
+    saliency_norm = ((saliency_map - np.min(saliency_map)) / (np.max(saliency_map) - np.min(saliency_map)))
+    
+    return saliency_norm
 
 def fuzzy_grow(saliency_map):
 
@@ -99,13 +75,7 @@ def fuzzy_grow(saliency_map):
 
 
     attended_area = attended_area * ((saliency_map < seed) * (saliency_map > s))
-
-    #print s
-
     attended_area = attended_area * 255
-
-    #imshow('grow map', attended_area)
-    #waitKey(0)
 
     return attended_area
 
@@ -169,8 +139,6 @@ def saliency_distance(luv, radius):
 def gaussian_distance(x, y):
 
     elu_dist = math.sqrt(np.dot((x - y), (x-y).transpose()))
-    #elu_dist = np.dot((x - y), (x-y).transpose())
-    #return (1 - math.exp(- elu_dist/2))
     return elu_dist
 
 def color_quant(img, k):

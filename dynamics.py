@@ -33,7 +33,7 @@ def get_dynamics(img):
     num_dyna = np.sum(dyna_idx)
 
     len_stat = np.sum(length[stat_idx])
-    len_dyna = np.sum(length[num_dyna])
+    len_dyna = np.sum(length[dyna_idx])
 
     if num_dyna == 0:
         num_dyna = 1
