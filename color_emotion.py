@@ -13,24 +13,13 @@ def get_colemotion(img):
     S = np.array(HSL[:, :, 1], np.int16)
 
     c = [0.0] * 7
-    #U = np.zeros((img.shape[0], img.shape[1], 5))
-    #c = np.zeros((7, 1), np.int16)
-
 
     c[0] = np.min(L)
     c[6] = np.max(L)
     for j in range(1, 6):
         c[j] = int( c[0]+ j * (c[6] * 1.0000 - c[0] * 1.0000) / 6)
-    #
-    # for h in range(L.shape[0]):
-    #     for w in range(L.shape[1]):
-    #         x = L[h, w]
-    #         if x <= c[1]:
-    #             U[h, w, :] = 0
-    #             U[h, w, 1] = 1
-    #         if x > c[5]:
-    #             U[h, w, :] = 0
-    #             U[h, w, ]
+    
+    
     while True:
         U = np.zeros((img.shape[0], img.shape[1], 5))
 
@@ -126,8 +115,5 @@ def get_colemotion(img):
 
     hist = histogram1 + histogram2
 
-    # print histogram1
-    # print histogram2
-    # print hist
     return hist
 

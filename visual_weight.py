@@ -17,8 +17,6 @@ def visual_weight(img, subject_region):
     W = subject_region['W']
     H = subject_region['H']
 
-    #print 'fimg shape', fshift_img.shape
-
     sb = gray[int(x0 - H / 2): int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2)]
     fsb = np.fft.fft2(sb)
     fshift_sb = np.fft.fftshift(fsb)

@@ -57,9 +57,6 @@ def edge_distr(img):
     #normalize to sum to 1
     laplac_img = laplac_img / np.sum(laplac_img)
 
-    # imshow('laplac', laplac_img)
-    # waitKey(0)
-
     Px = np.sum(laplac_img, 1)
     Py = np.sum(laplac_img, 0)
 
