@@ -73,8 +73,12 @@ def get_naturalness(img, saliency_map3):
     hsl_img = bgr2hsl(img)
     if saliency_map3 != None:
 	hsl_img = saliency_map3 * hsl_img
+
     pixels = hsl_img[((hsl_img[:,:,2]<0.8) * (hsl_img[:,:,2]>0.2) * (hsl_img[:,:,1]> 0.1))]
-    
+    print 'Pixel Size:', pixels.shape
+    if pixels.shape[0] < 10:
+	return False
+
     A = pixels[(pixels[:,0]>=25) * (pixels[:,0]<70)]
     num_A = np.sum((pixels[:, 0]>=25) * (pixels[:,0]<70))
     B = pixels[(pixels[:,0]>=95) * (pixels[:,0]<135)]

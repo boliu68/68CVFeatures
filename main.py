@@ -37,10 +37,14 @@ def get_fea(start, end, index, fail_list):
 		if image != None:
 		    resize_img = cv2.resize(image, (100, 100))
 		    fea = img_process(resize_img, writer, img_idx, label)
-		    output_file.flush()	
+		    output_file.flush()
+		    if fea == False:
+			fail_list.write('%s \n' % img_idx)
 		else:
 		    fail_list.write('%s \n' % img_idx)
-
+		
+		fail_list.flush()
+	
 	output_file.close()
 
     #read and resize to 100 * 100
@@ -57,7 +61,7 @@ if __name__ == '__main__':
 	label_path = 'data/AllUser.label.txt'
 	label_idx = (open(label_path, 'r')).readlines()
 	thread_num = 1
-	zero = 0
+	zero = 3105
 	
 	step = math.ceil((len(label_idx) - zero) * 1.000/ thread_num) 
 	pids = {}

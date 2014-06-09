@@ -82,6 +82,11 @@ def img_process(img, writer, path, label):
     time7 = float(time.clock())
     print "Dynamic:", time7 - time6
 
+    #print 'Natrual:', naturalness, 'sb natural:', sb_naturalness
+
+    if naturalness == False or sb_naturalness == False:
+	return False
+
     writer.writerow(fea_vec)
 
     return fea
