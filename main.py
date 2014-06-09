@@ -60,8 +60,8 @@ if __name__ == '__main__':
 	fail_list = open('Fail_list.txt', 'w+')
 	label_path = 'data/AllUser.label.txt'
 	label_idx = (open(label_path, 'r')).readlines()
-	thread_num = 1
-	zero = 3105
+	thread_num = 15
+	zero = 0 
 	
 	step = math.ceil((len(label_idx) - zero) * 1.000/ thread_num) 
 	pids = {}
