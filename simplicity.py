@@ -33,7 +33,8 @@ def get_simplicity(img, saliency_map, subject_region):
     W = subject_region['W']
     H = subject_region['H']
 
-    qh_sub = hue_count(img[int(x0 - H /2):int(x0 + H / 2), int(y0 - W / 2):int(y0 + W / 2), :])
+    print 'X0:',x0,'H/2:',H/2,'Y0:',y0,'W/2:',W/2
+    qh_sub = hue_count(img[int(y0 - H /2):int(y0 + H / 2), int(x0 - W / 2):int(x0 + W / 2), :])
 
     return [qimg, qimg3, qh, qh_sub]
 
@@ -83,13 +84,15 @@ def hue_count(img):
 
     good_h = hsv[good_id, 0]
 
-    bin, _ = np.histogram(good_h, 20)
+    if good_h.shape[0] > 0:
+	bin, _ = np.histogram(good_h, 20)
 
-    m = np.max(bin)
-    a = 0.05
-    N = np.sum(bin > a * m)
+	m = np.max(bin)
+	a = 0.05
+	N = np.sum(bin > a * m)
+    else:
+	N = 0
 
     qh = 20 - N
-
 
     return qh

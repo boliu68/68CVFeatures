@@ -87,6 +87,12 @@ def img_process(img, writer, path, label):
     if naturalness == False or sb_naturalness == False:
 	return False
 
+    #output the saliency map and the attened area
+    #saliency_map = saliency_map * 255
+    #rectangle(saliency_map, (subject_region['y0'] - subject_region['H'] / 2, subject_region['x0'] - subject_region['W'] / 2), (subject_region['y0'] + subject_region['H'] / 2, subject_region['x0'] + subject_region['W'] / 2), (255,0,0))
+    #imwrite(path+'.jpg',saliency_map) 
+    
+
     writer.writerow(fea_vec)
 
     return fea

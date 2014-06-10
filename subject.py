@@ -16,7 +16,7 @@ def subject(img):
 
     saliency_map = get_saliency(img)
     
-    [x0, y0, W, H] = attend_view(saliency_map) #get teh subject area
+    [x0, y0, W, H] = attend_view(saliency_map) #get the subject area
 
     saliency_map3 = np.zeros((saliency_map.shape[0], saliency_map.shape[1], 3))
 
