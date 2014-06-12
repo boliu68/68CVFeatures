@@ -39,9 +39,9 @@ def get_fea(start, end, index, fail_list):
 		    fea = img_process(resize_img, writer, img_idx, label)
 		    output_file.flush()
 		    if fea == False:
-			fail_list.write('%s \n' % img_idx)
+			fail_list.write('Code Error:%s \n' % img_idx)
 		else:
-		    fail_list.write('%s \n' % img_idx)
+		    fail_list.write('Img Error:%s \n' % img_idx)
 		
 		fail_list.flush()
 	
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 	label_path = 'data/AllUser.label.txt'
 	label_idx = (open(label_path, 'r')).readlines()
 	thread_num = 8 
-	zero = 0 
+	zero = 0#218190 
 	
 	step = math.ceil((len(label_idx) - zero) * 1.000/ thread_num) 
 	pids = {}

@@ -19,7 +19,8 @@ def get_colemotion(img):
     for j in range(1, 6):
         c[j] = int( c[0]+ j * (c[6] * 1.0000 - c[0] * 1.0000) / 6)
     
-    
+   
+    iteration_num = 0
     while True:
         U = np.zeros((img.shape[0], img.shape[1], 5))
 
@@ -50,13 +51,15 @@ def get_colemotion(img):
         old_c = c[:]
 
         for j in range(1, 6):
-            c[j] = int(np.sum(U[:, :, j - 1] * L) / np.sum(U[:, :, j - 1]))
+            c[j] = np.sum(U[:, :, j - 1] * L) / np.sum(U[:, :, j - 1])
             if np.isnan(c[j]):
-                return
+                return [False]
+	    c[j] = int(c[j])
 
-        if c == old_c:
-            #print c
-            break
+        if c == old_c or iteration_num > 50:
+	    #print 'Num of iteration:', iteration_num
+	    break
+	iteration_num += 1
 
     #2 fuzzy member function
     Uwarm = np.zeros(H.shape)

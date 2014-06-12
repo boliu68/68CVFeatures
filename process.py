@@ -77,6 +77,7 @@ def img_process(img, writer, path, label):
     fea_vec += [ratio_num, ratio_len]
     #to obtain the color histogram for emotion
     hist = get_colemotion(img)
+    print 'Hist finished:',hist
     fea['color_hist_fea'] = hist
     fea_vec += hist
     time7 = float(time.clock())
@@ -85,6 +86,10 @@ def img_process(img, writer, path, label):
     #print 'Natrual:', naturalness, 'sb natural:', sb_naturalness
 
     if naturalness == False or sb_naturalness == False:
+	print 'Error in naturalness'
+	return False
+    if len(hist) == 1:
+	print 'Error in color emotion'
 	return False
 
     #output the saliency map and the attened area
@@ -92,7 +97,6 @@ def img_process(img, writer, path, label):
     #rectangle(saliency_map, (subject_region['y0'] - subject_region['H'] / 2, subject_region['x0'] - subject_region['W'] / 2), (subject_region['y0'] + subject_region['H'] / 2, subject_region['x0'] + subject_region['W'] / 2), (255,0,0))
     #imwrite(path+'.jpg',saliency_map) 
     
-
     writer.writerow(fea_vec)
 
     return fea

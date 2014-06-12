@@ -56,7 +56,6 @@ def PeerGroupFiltering(img, window_size):
                 else:
                     a2 = 0
 		
-
 		#if a1 == 0:
 		   # print 'a1'
 		#if a2 == 0:
@@ -118,4 +117,5 @@ def matlab_style_gauss2d(shape = (3,3), sigma = 1):
     sumh = h.sum()
     if sumh != 0:
         h /= sumh
-    return h
+    return hr
+
