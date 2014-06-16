@@ -109,6 +109,10 @@ def get_naturalness(img, saliency_map3):
         N_grass = 0
     if math.isnan(N_sky):
         N_sky = 0
-    N = (num_A * N_skin + num_B * N_grass + num_C * N_sky) / (num_A + num_B + num_C)
-    
+
+    if num_A + num_B + num_C != 0:
+        N = (num_A * N_skin + num_B * N_grass + num_C * N_sky) / (num_A + num_B + num_C)
+    else:
+	N = 0
+
     return N

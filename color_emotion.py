@@ -51,7 +51,10 @@ def get_colemotion(img):
         old_c = c[:]
 
         for j in range(1, 6):
-            c[j] = np.sum(U[:, :, j - 1] * L) / np.sum(U[:, :, j - 1])
+	    U_sum = np.sum(U[:, :, j - 1]);
+	    if U_sum == 0:
+		U_sum = 1
+            c[j] = np.sum(U[:, :, j - 1] * L) / U_sum 
             if np.isnan(c[j]):
                 return [False]
 	    c[j] = int(c[j])
